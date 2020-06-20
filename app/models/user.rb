@@ -11,7 +11,8 @@ class User < ApplicationRecord
   # 2つのペアの仮想的な属性（passwordとpassword_confirmation）が使えるようになる。また、存在性と値が一致するかどうかのバリデーションも追加される。
   # authenticateメソッドが使えるようになる（引数の文字列がパスワードと一致するとUserオブジェクトを、間違っているとfalseを返すメソッド）。
   has_secure_password
-  validates :password, presence: true, length: { minimum: 6 }
+  # has_secure_passwordでは（追加したバリデーションとは別に）オブジェクト生成時に存在性を検証するようになっているため、空のパスワード（nil）が新規ユーザー登録時に有効になることはありません。（空のパスワードを入力すると存在性のバリデーションとhas_secure_passwordによるバリデーションがそれぞれ実行され、2つの同じエラーメッセージ（"Password can't be blank" or "Password is too short (minimum is 6 characters)"）が表示されるというバグがありましたが（7.3.3）、これで解決できました。）
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
   # 渡された文字列のハッシュ値を返す
   # ref: https://github.com/rails/rails/blob/master/activemodel/lib/active_model/secure_password.rb#L100-L101

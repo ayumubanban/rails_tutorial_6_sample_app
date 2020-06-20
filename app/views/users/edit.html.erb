@@ -1,0 +1,15 @@
+<% provide(:title, "Edit user") %>
+<% provide(:button_text, 'Save changes') %>
+<h1>Update your profile</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%# Railsは、ユーザーが新規なのか、それともデータベースに存在する既存のユーザーであるかを、Active Recordのnew_record?論理値メソッドを使って区別できる %>
+    <%# Railsは、form_with(@user)を使ってフォームを構成すると、@user.new_record?がtrueのときにはPOSTを、falseのときにはPATCHを使います。 %>
+    <%= render 'form' %>
+    <div class="gravatar_edit">
+      <%= gravatar_for @user %>
+      <a href="https://gravatar.com/emails" target="_blank" rel="noopener">change</a>
+    </div>
+  </div>
+</div>
