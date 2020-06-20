@@ -6,11 +6,15 @@ class UsersController < ApplicationController
   def index
     # @users = User.all
     # :pageパラメーターにはparams[:page]が使われているが、これはwill_paginateによって自動的に生成される
-    @users = User.paginate(page: params[:page])
+    # 演習：有効でないユーザーは表示する意味がない
+    @users = User.where(activated: true).paginate(page: params[:page])
   end
 
   def show
     @user = User.find(params[:id])
+    # 演習：有効でないユーザーは表示する意味がない
+    # &&だとroot_urlとの論理的な結び付きが強くなりすぎてしまい、不適切らしい。が、andだとrubocopに怒られるのねぇ…
+    redirect_to root_url and return unless @user.activated?
     # debugger # これでbyebug起動できる
   end
 
@@ -21,9 +25,14 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      log_in @user
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
+      @user.send_activation_email
+      # UserMailer.account_activation(@user).deliver_now
+      flash[:info] = 'Please check your email to activate your account.'
+      redirect_to root_url
+
+      # log_in @user
+      # flash[:success] = "Welcome to the Sample App!"
+      # redirect_to @user
       # redirect_to user_url(@user)
     else
       render 'new'

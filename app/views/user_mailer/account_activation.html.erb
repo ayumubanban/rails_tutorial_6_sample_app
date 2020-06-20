@@ -1,0 +1,12 @@
+<h1>Sample App</h1>
+
+<p>Hi <%= @user.name %>,</p>
+
+<p>
+Welcome to the Sample App! Click on the link below to activate your account:
+</p>
+
+<%# account_activations/q5lt38hQDc_959PVoo6b7A/edit?email=foo%40example.com %>
+<%# q5lt38hQDc_959PVoo6b7A という部分は new_token メソッドで生成されたもの。これはちょうど/users/1/editの「1」のようなユーザーIDと同じ役割を果たす %>
+<%# , email: @user.email のように、クエリパラメータを設定できる %>
+<%= link_to "Activate", edit_account_activation_url(@user.activation_token, email: @user.email) %>
