@@ -73,6 +73,6 @@ class UserTest < ActiveSupport::TestCase
 
   test "authenticated? should return false for a user with nil digest" do
     # 記憶トークンを空欄のままにしていることにご注目ください。記憶トークンが使われる前に（BCrypt::Password.new(nil)となって）エラーが発生するので、記憶トークンの値は何でも構わないのです。
-    assert_not @user.authenticated?('')
+    assert_not @user.authenticated?(:remember, '')
   end
 end
