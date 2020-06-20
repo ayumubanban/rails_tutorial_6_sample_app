@@ -1,0 +1,16 @@
+<% provide(:title, 'All users') %>
+<h1>All users</h1>
+
+<%# usersビューのコードの中から@usersオブジェクトを自動的に見つけ出し、それから他のページにアクセスするためのページネーションリンクを作成 %>
+<%= will_paginate %>
+
+<ul class="users">
+  <%# Railsは@users をUserオブジェクトのリストであると推測します。さらに、ユーザーのコレクションを与えて呼び出すと、Railsは自動的にユーザーのコレクションを列挙し、それぞれのユーザーを_user.html.erbパーシャルで出力します。 %>
+  <%= render @users %>
+  <%# @users.each do |user| %>
+    <%# renderをパーシャル（ファイル名の文字列）に対してではなく、Userクラスのuser変数（このuserという名前そのものはまったく重要ではない。重要なのは、そのオブジェクトそのものではなく、そのオブジェクトが属しているクラス（この場合はUserクラス）の方）に対して実行している %>
+    <%#= render user %>
+  <%# end %>
+</ul>
+
+<%= will_paginate %>

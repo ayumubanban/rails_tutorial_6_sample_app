@@ -28,6 +28,13 @@ module SessionsHelper
     end
   end
 
+  # 渡されたユーザーがカレントユーザーであればtrueを返す
+  def current_user?(user)
+    # userがnilになってしまったレアケースもキャッチ
+    user && user == current_user
+    # user&. == current_user
+  end
+
   # ユーザーがログインしていればtrue、その他ならfalseを返す
   def logged_in?
     !current_user.nil?
@@ -49,5 +56,23 @@ module SessionsHelper
     forget(current_user)
     session.delete(:user_id)
     @current_user = nil
+  end
+
+  # このへんのフレンドリーフォワーディングについての実装のコードでは、thoughtbot社が提供するClearance gemを適用しているらしい！[10章脚注6]
+  # ってことは、Clearanceのgemをbundle installせんでええのか？
+
+  # 記憶したURL（もしくはデフォルト値）にリダイレクト
+  # この命名すごく良いなぁ。関数名と共に引数名も合わせて利用して良い感じにする感じ良いなぁ。
+  def redirect_back_or(default)
+    # 値がnilでなければsession[:forwarding_url]を評価し、そうでなければデフォルトのURLを使う
+    redirect_to(session[:forwarding_url] || default)
+    # これをやっておかないと、次回ログインしたときに保護されたページに転送されてしまい、ブラウザを閉じるまでこれが繰り返されてしまう
+    session.delete(:forwarding_url)
+  end
+
+  # アクセスしようとしたURLを覚えておく
+  def store_location
+    # request.original_urlでリクエスト先が取得できる
+    session[:forwarding_url] = request.original_url if request.get? # GETリクエストが送られたときだけ格納
   end
 end
