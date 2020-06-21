@@ -64,6 +64,13 @@ gem 'bcrypt',         '3.1.13'
 gem 'faker',          '2.1.2'
 gem 'will_paginate',           '3.1.8'
 gem 'bootstrap-will_paginate', '1.0.0'
+# 執筆時点のActive Storageは、（少々驚きですが）こうしたフォーマット機能やバリデーション機能がネイティブでサポートされていません。よくあることですが、こういう場合はそうした機能をgemで追加
+gem 'active_storage_validations', '0.8.2'
+# 本番環境がHerokuであれば、既に本番環境でImageMagickが使えるようになっているのだそう。
+gem 'image_processing',           '1.9.3'
+gem 'mini_magick',                '4.9.5'
+# 取り込んだけど、利用していない
+gem 'aws-sdk-s3',              '1.46.0', require: false
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

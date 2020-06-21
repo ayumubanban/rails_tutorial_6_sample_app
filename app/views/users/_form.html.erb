@@ -1,4 +1,5 @@
 <%= form_with(model: @user, local: true) do |f| %>
+  <%# @userでいけるよな。f.objectじゃなくても %>
   <%= render 'shared/error_messages', object: @user %>
 
   <%= f.label :name %>

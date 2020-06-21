@@ -12,6 +12,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
     # 演習：有効でないユーザーは表示する意味がない
     # &&だとroot_urlとの論理的な結び付きが強くなりすぎてしまい、不適切らしい。が、andだとrubocopに怒られるのねぇ…
     redirect_to root_url and return unless @user.activated?
@@ -63,16 +64,6 @@ class UsersController < ApplicationController
       # 編集してもよい安全な属性だけを更新させる
       # patch /users/17?admin=1 とかを送信されるのを防ぐ
       params.require(:user).permit(:name, :email, :password, :password_confirmation)
-    end
-
-    # ログイン済みユーザーかどうか確認
-    # 命名はrequire_loginとかのがしっくりくる感…
-    def logged_in_user
-      unless logged_in?
-        store_location
-        flash[:danger] = 'Please log in.'
-        redirect_to login_url
-      end
     end
 
     # 正しいユーザーかどうか確認

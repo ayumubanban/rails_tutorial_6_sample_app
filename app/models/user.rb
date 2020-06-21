@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_many :microposts, dependent: :destroy
+
   attr_accessor :remember_token, :activation_token, :reset_token
   # before_save { self.email = email.downcase }
   # before_save { email.downcase! }
@@ -89,6 +91,14 @@ class User < ApplicationRecord
   # パスワード再設定の期限が切れている場合はtrueを返す
   def password_reset_expired?
     reset_sent_at < 2.hours.ago
+  end
+
+  # 試作feedの定義
+  # 完全な実装は次章の「ユーザーをフォローする」を参照
+  def feed
+    # 疑問符があることで、SQLクエリに代入する前にidがエスケープされるため、SQLインジェクション（SQL Injection）呼ばれる深刻なセキュリティホールを避けることができます。この場合のid属性は単なる整数（すなわちself.idはユーザーのid）であるため危険はありませんが、SQL文に変数を代入する場合は常にエスケープする習慣をぜひ身につけてください。
+    # self.microposts もしくは micropostsでも同等の意味っぽい
+    Micropost.where('user_id = ?', id)
   end
 
   # Userモデル内でしか使わないので、外部に公開する必要はない

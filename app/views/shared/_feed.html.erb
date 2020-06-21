@@ -1,0 +1,9 @@
+<% if @feed_items.any? %>
+  <ol class="microposts">
+    <%# @feed_itemsの各要素がMicropostクラスを持っていたため、RailsはMicropostのパーシャルを呼び出すことができました。このように、Railsは対応する名前のパーシャルを、渡されたリソースのディレクトリ内から探しにいくことができます。 %>
+    <%# app/views/microposts/_micropost.html.erb %>
+    <%= render @feed_items %>
+  </ol>
+  <%# 以前のままだとvalidation弾かれた後に次ページに移ろうとすると /microposts?page=2 と、存在しないmicroposts#indexを参照してしまう。この問題の解消 %>
+  <%= will_paginate @feed_items, params: { controller: :static_pages, action: :home } %>
+<% end %>

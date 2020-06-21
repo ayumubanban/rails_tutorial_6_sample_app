@@ -75,4 +75,12 @@ class UserTest < ActiveSupport::TestCase
     # 記憶トークンを空欄のままにしていることにご注目ください。記憶トークンが使われる前に（BCrypt::Password.new(nil)となって）エラーが発生するので、記憶トークンの値は何でも構わないのです。
     assert_not @user.authenticated?(:remember, '')
   end
+
+  test 'associated microposts should be destroyed' do
+    @user.save
+    @user.microposts.create!(content: 'Lorem ipsum')
+    assert_difference 'Micropost.count', -1 do
+      @user.destroy
+    end
+  end
 end
