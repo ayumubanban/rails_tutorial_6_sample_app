@@ -1,5 +1,11 @@
 class User < ApplicationRecord
   has_many :microposts, dependent: :destroy
+  has_many :active_relationships, class_name: 'Relationship', foreign_key: 'follower_id', dependent: :destroy
+  has_many :passive_relationships, class_name: 'Relationship', foreign_key: 'followed_id', dependent: :destroy
+  # :sourceパラメーター（リスト 14.8）を使って、「following配列の元はfollowed idの集合である」ということを明示的にRailsに伝える
+  has_many :following, through: :active_relationships, source: :followed
+  # :followers属性の場合、Railsが「followers」を単数形にして自動的に外部キーfollower_idを探してくれるので、参照先（followers）を指定するための:sourceキーを省略してもよかった
+  has_many :followers, through: :passive_relationships, source: :follower
 
   attr_accessor :remember_token, :activation_token, :reset_token
   # before_save { self.email = email.downcase }
@@ -98,7 +104,32 @@ class User < ApplicationRecord
   def feed
     # 疑問符があることで、SQLクエリに代入する前にidがエスケープされるため、SQLインジェクション（SQL Injection）呼ばれる深刻なセキュリティホールを避けることができます。この場合のid属性は単なる整数（すなわちself.idはユーザーのid）であるため危険はありませんが、SQL文に変数を代入する場合は常にエスケープする習慣をぜひ身につけてください。
     # self.microposts もしくは micropostsでも同等の意味っぽい
-    Micropost.where('user_id = ?', id)
+    # Micropost.where('user_id = ?', id)
+    # following_idsメソッドは、has_many :followingの関連付けをしたときにActive Recordが自動生成したものです（リスト 14.8）。これにより、user.followingコレクションに対応するidを得るためには、関連付けの名前の末尾に_idsを付け足すだけで済みます。
+    # ?を内挿すると自動的にこの辺りの面倒（配列(元々following_idsは配列)を連結した文字列（ここでは.join(', ')）に変換するとか）を見てくれます。
+    # Micropost.where('user_id IN (?) OR user_id = ?', following_ids, id)
+    # Micropost.where('user_id IN (:following_ids) OR user_id = :user_id', following_ids: following_ids, user_id: id)
+    # このサブセレクトは集合のロジックを（Railsではなく）データベース内に保存するので、より効率的にデータを取得することができる
+    following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
+    Micropost.where("user_id IN (#{following_ids}) OR user_id = :user_id", user_id: id)
+    # 演習 リスト14.50
+    # part_of_feed = "relationships.follower_id = :id or microposts.user_id = :id"
+    # Micropost.joins(user: :followers).where(part_of_feed, { id: id })
+  end
+
+  # ユーザーをフォローする
+  def follow(other_user)
+    following << other_user
+  end
+
+  # ユーザーをフォロー解除する
+  def unfollow(other_user)
+    active_relationships.find_by(followed_id: other_user.id).destroy
+  end
+
+  # 現在のユーザーがフォローしてたらtrueを返す
+  def following?(other_user)
+    following.include?(other_user)
   end
 
   # Userモデル内でしか使わないので、外部に公開する必要はない

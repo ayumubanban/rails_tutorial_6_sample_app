@@ -1,0 +1,18 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# 前半の2つでMichaelがLanaとMaloryをフォローし、後半の2つでLanaとArcherがMichaelをフォロー
+one:
+  follower: michael
+  followed: lana
+
+two:
+  follower: michael
+  followed: malony
+
+three:
+  follower: lana
+  followed: michael
+
+four:
+  follower: archer
+  followed: michael
