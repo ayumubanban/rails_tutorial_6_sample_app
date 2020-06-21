@@ -31,3 +31,11 @@ User.create!(
     activated_at: Time.zone.now
   )
 end
+
+# ユーザーの一部を対象にマイクロポストを生成する
+# orderメソッドを経由することで、作成されたユーザーの最初の6人を明示的に呼び出す
+users = User.order(:created_at).take(6)
+50.times do
+  content = Faker::Lorem.sentence(word_count: 5)
+  users.each { |user| user.microposts.create!(content: content) }
+end

@@ -1,0 +1,23 @@
+<%= form_with(model: @micropost, local: true) do |f| %>
+  <%# このf.objectは@micropostと同じなんだよな？じゃあこの部分は@micropostって書いた方がわかりやすいのでは？っと思うんだが… %>
+  <%= render 'shared/error_messages', object: f.object %>
+  <div class="field">
+    <%= f.text_area :content, placeholder: "Compose new micropost..." %>
+  </div>
+  <%= f.submit "Post", class: "btn btn-primary" %>
+  <span class="image">
+    <%# 最初に有効な画像フォーマットだけを選択可能にしておき、それ以外のファイルタイプを灰色で表示 %>
+    <%= f.file_field :image, accept: "image/jpeg, image/gif, image/png" %>
+  </span>
+<% end %>
+
+<%# ジェ…jQuery… %>
+<script type="text/javascript">
+  $("#micropost_image").bind("change", function() {
+    var size_in_megabytes = this.files[0].size/1024/1024;
+    if (size_in_megabytes > 5) {
+      alert("Maximum file size is 5MB. Please choose a smaller file.");
+      $("#micropost_image").val("");
+    }
+  });
+</script>
